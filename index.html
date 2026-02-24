@@ -7,118 +7,111 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0f0f0f;
-    --surface: #181818;
-    --surface2: #222222;
-    --border: #2a2a2a;
-    --accent: #c8a96e;
-    --neg: #c87070;
-    --neu: #8a8a8a;
-    --pos: #7eb8a0;
-    --text: #e8e4dc;
-    --text-muted: #6a6a6a;
-    --text-dim: #9a9a9a;
+    --bg: #0f0f0f; --surface: #181818; --surface2: #222222; --border: #2a2a2a;
+    --accent: #c8a96e; --neg: #c87070; --neu: #8a8a8a; --pos: #7eb8a0;
+    --text: #e8e4dc; --text-muted: #6a6a6a; --text-dim: #9a9a9a;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; font-size: 14px; }
-
-  /* LOCK */
-  #lockScreen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 999; }
-  .lock-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 40px 36px; width: 340px; text-align: center; }
+  #lockScreen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 999; flex-direction: column; gap: 16px; }
+  .lock-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 40px 36px; width: 360px; text-align: center; }
   .lock-icon { font-size: 36px; margin-bottom: 16px; opacity: 0.6; }
   .lock-title { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--accent); margin-bottom: 6px; }
-  .lock-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 28px; letter-spacing: 0.04em; }
+  .lock-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 24px; letter-spacing: 0.04em; }
   .lock-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 15px; outline: none; text-align: center; letter-spacing: 0.1em; margin-bottom: 12px; transition: border-color 0.2s; }
   .lock-input:focus { border-color: var(--accent); }
   .lock-btn { width: 100%; padding: 12px; background: var(--accent); color: #0f0f0f; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: opacity 0.2s; margin-bottom: 10px; }
   .lock-btn:hover { opacity: 0.85; }
   .lock-error { font-size: 12px; color: var(--neg); min-height: 18px; margin-top: 4px; }
-  .lock-setup-hint { font-size: 11px; color: var(--text-muted); margin-top: 14px; line-height: 1.5; }
+  .lock-setup-hint { font-size: 11px; color: var(--text-muted); margin-top: 14px; line-height: 1.6; }
   .lock-link { background: none; border: none; color: var(--text-muted); font-size: 12px; cursor: pointer; text-decoration: underline; margin-top: 8px; font-family: 'DM Sans', sans-serif; display: block; }
   .lock-link:hover { color: var(--accent); }
-
-  /* APP */
+  #setupScreen { position: fixed; inset: 0; background: var(--bg); display: none; align-items: center; justify-content: center; z-index: 998; }
+  .setup-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 36px; width: 480px; max-width: 90vw; }
+  .setup-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--accent); margin-bottom: 8px; }
+  .setup-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
+  .setup-step { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; font-size: 13px; line-height: 1.6; color: var(--text-dim); }
+  .setup-step strong { color: var(--text); }
+  .setup-url-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px; outline: none; transition: border-color 0.2s; margin-top: 12px; }
+  .setup-url-input:focus { border-color: var(--accent); }
+  .setup-actions { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; }
+  .sync-status { font-size: 11px; color: var(--text-muted); padding: 6px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; min-height: 28px; }
+  .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--neu); flex-shrink: 0; }
+  .sync-dot.synced { background: var(--pos); }
+  .sync-dot.syncing { background: var(--accent); animation: pulse 1s infinite; }
+  .sync-dot.error { background: var(--neg); }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
   #app { display: none; }
   #app.visible { display: flex; height: 100vh; overflow: hidden; }
   .sidebar { width: 260px; min-width: 260px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
   .main { flex: 1; overflow-y: auto; padding: 40px; }
-  .sidebar-header { padding: 24px 20px 16px; border-bottom: 1px solid var(--border); }
+  .sidebar-header { padding: 20px 20px 14px; border-bottom: 1px solid var(--border); }
   .app-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--accent); letter-spacing: 0.02em; margin-bottom: 2px; }
   .app-subtitle { font-size: 11px; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; }
-  .sidebar-actions { padding: 10px 16px; border-bottom: 1px solid var(--border); display: flex; gap: 6px; flex-wrap: wrap; }
-  .sab { flex: 1; min-width: 44px; padding: 6px 4px; background: transparent; border: 1px solid var(--border); border-radius: 5px; color: var(--text-muted); font-family: 'DM Sans', sans-serif; font-size: 11px; cursor: pointer; transition: all 0.2s; text-align: center; white-space: nowrap; }
+  .sidebar-actions { padding: 8px 16px; border-bottom: 1px solid var(--border); display: flex; gap: 5px; flex-wrap: wrap; }
+  .sab { flex: 1; min-width: 40px; padding: 5px 4px; background: transparent; border: 1px solid var(--border); border-radius: 5px; color: var(--text-muted); font-family: 'DM Sans', sans-serif; font-size: 10px; cursor: pointer; transition: all 0.2s; text-align: center; white-space: nowrap; }
   .sab:hover { border-color: var(--accent); color: var(--accent); }
-  .sidebar-search { padding: 12px 16px; border-bottom: 1px solid var(--border); }
-  .sidebar-search input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; outline: none; transition: border-color 0.2s; }
+  .sidebar-search { padding: 10px 16px; border-bottom: 1px solid var(--border); }
+  .sidebar-search input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 7px 12px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px; outline: none; transition: border-color 0.2s; }
   .sidebar-search input:focus { border-color: var(--accent); }
   .sidebar-search input::placeholder { color: var(--text-muted); }
-  .sidebar-list { flex: 1; overflow-y: auto; padding: 8px 0; }
-  .sidebar-list::-webkit-scrollbar { width: 4px; }
-  .sidebar-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-  .staff-item { padding: 10px 20px; cursor: pointer; border-left: 3px solid transparent; transition: all 0.15s; display: flex; align-items: center; gap: 10px; }
-  .staff-item:hover { background: var(--surface2); }
-  .staff-item.active { background: var(--surface2); border-left-color: var(--accent); }
-  .staff-code { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--accent); font-weight: 500; min-width: 64px; }
-  .staff-role { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .add-btn { margin: 12px 16px; padding: 10px; background: transparent; border: 1px dashed var(--border); border-radius: 6px; color: var(--text-muted); font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.2s; width: calc(100% - 32px); }
-  .add-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-  /* LOCATION FILTER */
-  .loc-filter { padding: 10px 16px 4px; border-bottom: 1px solid var(--border); }
-  .loc-filter-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
-  .loc-chips { display: flex; flex-wrap: wrap; gap: 4px; padding-bottom: 8px; }
-  .loc-chip { padding: 3px 8px; border-radius: 12px; border: 1px solid var(--border); font-size: 11px; color: var(--text-muted); cursor: pointer; transition: all 0.15s; font-family: 'DM Mono', monospace; background: transparent; white-space: nowrap; }
+  .loc-filter { padding: 8px 16px 4px; border-bottom: 1px solid var(--border); }
+  .loc-filter-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 5px; }
+  .loc-chips { display: flex; flex-wrap: wrap; gap: 3px; padding-bottom: 6px; }
+  .loc-chip { padding: 2px 7px; border-radius: 12px; border: 1px solid var(--border); font-size: 10px; color: var(--text-muted); cursor: pointer; transition: all 0.15s; font-family: 'DM Mono', monospace; background: transparent; white-space: nowrap; }
   .loc-chip:hover { border-color: var(--accent); color: var(--accent); }
   .loc-chip.active { background: rgba(200,169,110,0.15); border-color: var(--accent); color: var(--accent); }
-
-  /* LOCATION BADGE ON PROFILE */
-  .loc-badge { display: inline-block; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--pos); background: rgba(126,184,160,0.1); border: 1px solid rgba(126,184,160,0.25); padding: 2px 8px; border-radius: 4px; margin-left: 8px; vertical-align: middle; }
-
-  /* GROUP HEADER IN LIST */
-  .list-group-header { padding: 8px 20px 4px; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'DM Mono', monospace; }
-
-  /* EMPTY */
+  .sidebar-list { flex: 1; overflow-y: auto; padding: 6px 0; }
+  .sidebar-list::-webkit-scrollbar { width: 4px; }
+  .sidebar-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .list-group-header { padding: 8px 20px 3px; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'DM Mono', monospace; }
+  .staff-item { padding: 9px 20px; cursor: pointer; border-left: 3px solid transparent; transition: all 0.15s; display: flex; align-items: center; gap: 10px; }
+  .staff-item:hover { background: var(--surface2); }
+  .staff-item.active { background: var(--surface2); border-left-color: var(--accent); }
+  .staff-code { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--accent); font-weight: 500; min-width: 60px; }
+  .staff-role { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .add-btn { margin: 10px 16px; padding: 9px; background: transparent; border: 1px dashed var(--border); border-radius: 6px; color: var(--text-muted); font-family: 'DM Sans', sans-serif; font-size: 12px; cursor: pointer; transition: all 0.2s; width: calc(100% - 32px); }
+  .add-btn:hover { border-color: var(--accent); color: var(--accent); }
   .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); text-align: center; gap: 12px; }
   .empty-icon { font-size: 48px; opacity: 0.3; }
   .empty-title { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--text-dim); }
   .empty-sub { font-size: 13px; line-height: 1.6; max-width: 280px; }
-
-  /* PROFILE */
-  .profile-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+  .profile-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
   .profile-code-badge { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--accent); background: rgba(200,169,110,0.1); border: 1px solid rgba(200,169,110,0.2); padding: 4px 10px; border-radius: 4px; margin-bottom: 8px; display: inline-block; }
   .profile-role-display { font-size: 22px; font-family: 'DM Serif Display', serif; color: var(--text); margin-bottom: 4px; }
+  .loc-badge { display: inline-block; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--pos); background: rgba(126,184,160,0.1); border: 1px solid rgba(126,184,160,0.25); padding: 2px 8px; border-radius: 4px; margin-left: 8px; vertical-align: middle; }
   .profile-actions { display: flex; gap: 8px; }
-  .btn { padding: 8px 16px; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.2s; border: none; }
+  .btn { padding: 7px 14px; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.2s; border: none; }
   .btn-primary { background: var(--accent); color: #0f0f0f; font-weight: 500; }
   .btn-primary:hover { opacity: 0.85; }
   .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
   .btn-ghost:hover { border-color: var(--text-muted); color: var(--text); }
   .btn-danger { background: transparent; color: var(--neg); border: 1px solid rgba(200,112,112,0.3); }
   .btn-danger:hover { background: rgba(200,112,112,0.1); }
-  .section { margin-bottom: 28px; }
-  .section-title { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .section { margin-bottom: 24px; }
+  .section-title { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
   .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .info-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .info-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
   .info-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
-  .info-value { font-size: 14px; color: var(--text); line-height: 1.4; }
+  .info-value { font-size: 13px; color: var(--text); line-height: 1.4; }
   .info-value:empty::after { content: '—'; color: var(--text-muted); }
-  .interactions-list { display: flex; flex-direction: column; gap: 10px; }
-  .interaction-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; border-left: 3px solid var(--neu); position: relative; }
+  .interactions-list { display: flex; flex-direction: column; gap: 8px; }
+  .interaction-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; border-left: 3px solid var(--neu); position: relative; }
   .interaction-card.positive { border-left-color: var(--pos); }
   .interaction-card.negative { border-left-color: var(--neg); }
   .interaction-card.neutral { border-left-color: var(--neu); }
-  .interaction-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-  .interaction-date { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted); }
-  .tone-badge { font-size: 11px; padding: 2px 8px; border-radius: 3px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+  .interaction-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+  .interaction-date { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); }
+  .tone-badge { font-size: 10px; padding: 2px 7px; border-radius: 3px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
   .tone-badge.positive { background: rgba(126,184,160,0.15); color: var(--pos); }
   .tone-badge.negative { background: rgba(200,112,112,0.15); color: var(--neg); }
   .tone-badge.neutral { background: rgba(138,138,138,0.15); color: var(--neu); }
   .interaction-notes { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
-  .interaction-delete { position: absolute; top: 10px; right: 10px; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px; padding: 2px 6px; border-radius: 4px; opacity: 0; transition: opacity 0.2s; }
+  .interaction-delete { position: absolute; top: 8px; right: 8px; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px; padding: 2px 6px; border-radius: 4px; opacity: 0; transition: opacity 0.2s; }
   .interaction-card:hover .interaction-delete { opacity: 1; }
   .interaction-delete:hover { color: var(--neg); }
-  .add-interaction-form { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; display: none; }
+  .add-interaction-form { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 12px; display: none; }
   .add-interaction-form.visible { display: block; }
   .form-row { display: flex; gap: 10px; margin-bottom: 10px; }
   .form-group { flex: 1; }
@@ -126,28 +119,22 @@
   input, textarea, select { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; transition: border-color 0.2s; resize: vertical; }
   input:focus, textarea:focus, select:focus { border-color: var(--accent); }
   select option { background: var(--surface2); }
-  .notes-full { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 14px; font-size: 13px; color: var(--text-dim); line-height: 1.6; min-height: 60px; white-space: pre-wrap; }
-  .notes-full:empty::after { content: 'No general notes yet.'; color: var(--text-muted); }
+  .notes-full { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-size: 13px; color: var(--text-dim); line-height: 1.6; min-height: 50px; white-space: pre-wrap; }
   .main::-webkit-scrollbar { width: 4px; }
   .main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-  /* MODALS */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(4px); }
   .modal-overlay.visible { display: flex; }
-  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px; width: 520px; max-width: 90vw; max-height: 85vh; overflow-y: auto; }
-  .modal-title { font-family: 'DM Serif Display', serif; font-size: 20px; margin-bottom: 20px; color: var(--accent); }
-  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
-
-  /* TOAST */
-  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 18px; font-size: 13px; color: var(--text); z-index: 9999; opacity: 0; transform: translateY(8px); transition: all 0.3s; pointer-events: none; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 26px; width: 520px; max-width: 90vw; max-height: 88vh; overflow-y: auto; }
+  .modal-title { font-family: 'DM Serif Display', serif; font-size: 20px; margin-bottom: 18px; color: var(--accent); }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 11px 16px; font-size: 13px; color: var(--text); z-index: 9999; opacity: 0; transform: translateY(8px); transition: all 0.3s; pointer-events: none; max-width: 300px; }
   .toast.show { opacity: 1; transform: translateY(0); }
   .toast.success { border-left: 3px solid var(--pos); }
   .toast.error { border-left: 3px solid var(--neg); }
+  .toast.info { border-left: 3px solid var(--accent); }
 </style>
 </head>
 <body>
-
-<!-- LOCK SCREEN -->
 <div id="lockScreen">
   <div class="lock-box">
     <div class="lock-icon">🔒</div>
@@ -160,8 +147,21 @@
     <button class="lock-link" id="resetLink" style="display:none" onclick="showResetFlow()">Forgot password / Reset all data</button>
   </div>
 </div>
-
-<!-- APP -->
+<div id="setupScreen">
+  <div class="setup-box">
+    <div class="setup-title">Connect Google Drive</div>
+    <div class="setup-sub">One-time setup. Your data will sync automatically across all your devices.</div>
+    <div class="setup-step"><strong>Step 1:</strong> Go to <strong>script.google.com</strong> and click <strong>New project</strong></div>
+    <div class="setup-step"><strong>Step 2:</strong> Delete any existing code. Paste in the Apps Script code from Claude.</div>
+    <div class="setup-step"><strong>Step 3:</strong> Click <strong>Deploy → New deployment</strong>. Type: <strong>Web app</strong>. Access: <strong>Anyone</strong>. Click Deploy and authorize.</div>
+    <div class="setup-step"><strong>Step 4:</strong> Copy the Web app URL and paste it below.</div>
+    <input type="text" class="setup-url-input" id="scriptUrl" placeholder="https://script.google.com/macros/s/...">
+    <div class="setup-actions">
+      <button class="btn btn-ghost" onclick="skipSetup()">Skip for now</button>
+      <button class="btn btn-primary" onclick="saveScriptUrl()">Connect & Continue</button>
+    </div>
+  </div>
+</div>
 <div id="app">
   <div class="sidebar">
     <div class="sidebar-header">
@@ -169,11 +169,14 @@
       <div class="app-subtitle">Relationship Manager</div>
     </div>
     <div class="sidebar-actions">
-      <button class="sab" onclick="exportData()">⬇ Export</button>
-      <button class="sab" onclick="document.getElementById('importFile').click()">⬆ Import</button>
+      <button class="sab" onclick="manualSync()">↻ Sync</button>
       <button class="sab" onclick="openChangePwModal()">🔑 PW</button>
+      <button class="sab" onclick="openSetupFromApp()">⚙ Drive</button>
       <button class="sab" onclick="lockApp()">🔒 Lock</button>
-      <input type="file" id="importFile" accept=".enc" style="display:none" onchange="importData(event)">
+    </div>
+    <div class="sync-status" id="syncStatus">
+      <div class="sync-dot" id="syncDot"></div>
+      <span id="syncText">Not connected</span>
     </div>
     <div class="sidebar-search">
       <input type="text" id="searchInput" placeholder="Search by code or role..." oninput="renderList()">
@@ -193,8 +196,6 @@
     </div>
   </div>
 </div>
-
-<!-- ADD/EDIT MODAL -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <div class="modal-title" id="modalTitle">Add Staff Member</div>
@@ -203,7 +204,7 @@
       <div class="form-group"><label>Role / Department</label><input type="text" id="fRole" placeholder="e.g. Special Ed Teacher"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>Location *</label><select id="fLoc"><option value="">-- Select Location --</option><option>HHS</option><option>MHK</option><option>PLD</option><option>GNR</option><option>WCB</option><option>EMK</option><option>Registration</option><option>Central</option><option>EAs</option><option>Outside EWRSD</option><option>Other</option></select></div>
+      <div class="form-group"><label>Location</label><select id="fLoc"><option value="">-- Select Location --</option><option>HHS</option><option>MHK</option><option>PLD</option><option>GNR</option><option>WCB</option><option>EMK</option><option>Registration</option><option>Central</option><option>EAs</option><option>Outside EWRSD</option><option>Other</option></select></div>
       <div class="form-group"><label>Years in District</label><input type="text" id="fYears" placeholder="e.g. 6 years"></div>
     </div>
     <div class="form-row">
@@ -224,369 +225,71 @@
     </div>
   </div>
 </div>
-
-<!-- CHANGE PW MODAL -->
 <div class="modal-overlay" id="pwModalOverlay">
   <div class="modal" style="width:380px">
     <div class="modal-title">Change Password</div>
     <div class="form-group" style="margin-bottom:10px"><label>Current Password</label><input type="password" id="pwCurrent" placeholder="••••••••"></div>
     <div class="form-group" style="margin-bottom:10px"><label>New Password</label><input type="password" id="pwNew" placeholder="••••••••"></div>
     <div class="form-group" style="margin-bottom:10px"><label>Confirm New Password</label><input type="password" id="pwConfirm" placeholder="••••••••"></div>
-    <div class="lock-error" id="pwError"></div>
+    <div style="font-size:12px;color:var(--neg);min-height:18px" id="pwError"></div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('pwModalOverlay')">Cancel</button>
       <button class="btn btn-primary" onclick="changePassword()">Update Password</button>
     </div>
   </div>
 </div>
-
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
-
 <script>
-const HASH_KEY = 'cx_pw_hash';
-const DATA_KEY = 'cx_data';
-let sessionKey = null;
-let staff = [];
-let selectedCode = null;
-let editingCode = null;
-const LOCATIONS = ['HHS','MHK','PLD','GNR','WCB','EMK','Registration','Central','EAs','Outside EWRSD','Other'];
-let activeLocFilter = null; // null = All
+const HASH_KEY='cx_pw_hash',DATA_KEY='cx_data',SCRIPT_URL_KEY='cx_script_url';
+const LOCATIONS=['HHS','MHK','PLD','GNR','WCB','EMK','Registration','Central','EAs','Outside EWRSD','Other'];
+let sessionKey=null,staff=[],selectedCode=null,editingCode=null,activeLocFilter=null,scriptUrl=null,syncTimeout=null;
 
-// ── CRYPTO ──
-async function hashPassword(pw) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
+async function hashPassword(pw){const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pw));return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');}
+async function deriveKey(pw){const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt:new TextEncoder().encode('connections_salt_v1'),iterations:100000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},true,['encrypt','decrypt']);}
+async function encryptData(data,key){const iv=crypto.getRandomValues(new Uint8Array(12));const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,new TextEncoder().encode(JSON.stringify(data)));const out=new Uint8Array(12+ct.byteLength);out.set(iv);out.set(new Uint8Array(ct),12);return btoa(String.fromCharCode(...out));}
+async function decryptData(b64,key){const bytes=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:bytes.slice(0,12)},key,bytes.slice(12));return JSON.parse(new TextDecoder().decode(pt));}
 
-async function deriveKey(pw) {
-  const km = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveKey']);
-  return crypto.subtle.deriveKey(
-    { name:'PBKDF2', salt: new TextEncoder().encode('connections_salt_v1'), iterations:100000, hash:'SHA-256' },
-    km, { name:'AES-GCM', length:256 }, true, ['encrypt','decrypt']
-  );
-}
+async function syncToCloud(enc){if(!scriptUrl)return;try{setSyncStatus('syncing','Saving...');const r=await fetch(scriptUrl,{method:'POST',body:JSON.stringify({action:'save',payload:enc})});const j=await r.json();if(j.success){setSyncStatus('synced','Saved to Drive · '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));}else throw new Error();}catch{setSyncStatus('error','Sync failed — saved locally');}}
+async function loadFromCloud(){if(!scriptUrl)return null;try{setSyncStatus('syncing','Loading from Drive...');const r=await fetch(scriptUrl+'?action=load');const j=await r.json();if(j.success&&j.payload){setSyncStatus('synced','Loaded from Drive');return j.payload;}setSyncStatus('synced','No cloud data yet');return null;}catch{setSyncStatus('error','Could not reach Drive');return null;}}
+function setSyncStatus(state,text){const d=document.getElementById('syncDot'),t=document.getElementById('syncText');if(!d||!t)return;d.className='sync-dot '+state;t.textContent=text;}
 
-async function encryptData(data, key) {
-  const iv = crypto.getRandomValues(new Uint8Array(12));
-  const ct = await crypto.subtle.encrypt({name:'AES-GCM',iv}, key, new TextEncoder().encode(JSON.stringify(data)));
-  const out = new Uint8Array(12 + ct.byteLength);
-  out.set(iv); out.set(new Uint8Array(ct), 12);
-  return btoa(String.fromCharCode(...out));
-}
+async function loadData(){const ce=await loadFromCloud();if(ce){try{staff=await decryptData(ce,sessionKey);localStorage.setItem(DATA_KEY,ce);return;}catch{}}const le=localStorage.getItem(DATA_KEY);if(le){try{staff=await decryptData(le,sessionKey);}catch{staff=[];}}else{staff=[];}}
+async function saveData(){const enc=await encryptData(staff,sessionKey);localStorage.setItem(DATA_KEY,enc);if(syncTimeout)clearTimeout(syncTimeout);syncTimeout=setTimeout(()=>syncToCloud(enc),1500);}
+async function manualSync(){const enc=await encryptData(staff,sessionKey);localStorage.setItem(DATA_KEY,enc);await syncToCloud(enc);showToast('Synced to Google Drive.','success');}
 
-async function decryptData(b64, key) {
-  const bytes = Uint8Array.from(atob(b64), c=>c.charCodeAt(0));
-  const pt = await crypto.subtle.decrypt({name:'AES-GCM', iv:bytes.slice(0,12)}, key, bytes.slice(12));
-  return JSON.parse(new TextDecoder().decode(pt));
-}
+async function initLockScreen(){scriptUrl=localStorage.getItem(SCRIPT_URL_KEY)||null;const hash=localStorage.getItem(HASH_KEY);if(!hash){document.getElementById('lockSub').textContent='Create a password to get started';document.getElementById('lockBtn').textContent='Set Password';document.getElementById('lockSetupHint').style.display='block';document.getElementById('resetLink').style.display='none';}else{document.getElementById('lockSub').textContent='Enter your password to continue';document.getElementById('lockBtn').textContent='Unlock';document.getElementById('resetLink').style.display='block';}setTimeout(()=>document.getElementById('lockInput').focus(),100);}
+async function unlock(){const pw=document.getElementById('lockInput').value;if(!pw){document.getElementById('lockError').textContent='Please enter a password.';return;}const hash=localStorage.getItem(HASH_KEY);if(!hash){if(pw.length<4){document.getElementById('lockError').textContent='At least 4 characters required.';return;}localStorage.setItem(HASH_KEY,await hashPassword(pw));sessionKey=await deriveKey(pw);staff=[];await saveData();showSetupScreen();}else{if(await hashPassword(pw)!==hash){document.getElementById('lockError').textContent='Incorrect password.';document.getElementById('lockInput').value='';document.getElementById('lockInput').focus();return;}sessionKey=await deriveKey(pw);document.getElementById('lockScreen').style.display='none';await loadData();openApp();}}
+function showSetupScreen(){document.getElementById('lockScreen').style.display='none';document.getElementById('setupScreen').style.display='flex';}
+function openSetupFromApp(){document.getElementById('scriptUrl').value=scriptUrl||'';document.getElementById('setupScreen').style.display='flex';}
+function saveScriptUrl(){const url=document.getElementById('scriptUrl').value.trim();if(!url||!url.includes('script.google.com')){showToast('Please enter a valid Apps Script URL.','error');return;}scriptUrl=url;localStorage.setItem(SCRIPT_URL_KEY,url);document.getElementById('setupScreen').style.display='none';openApp();showToast('Google Drive connected!','success');manualSync();}
+function skipSetup(){document.getElementById('setupScreen').style.display='none';openApp();}
+function openApp(){document.getElementById('app').classList.add('visible');setSyncStatus(scriptUrl?'synced':'','');initLocChips();renderList();}
+function lockApp(){sessionKey=null;staff=[];selectedCode=null;document.getElementById('app').classList.remove('visible');document.getElementById('lockScreen').style.display='flex';document.getElementById('lockInput').value='';document.getElementById('lockError').textContent='';initLockScreen();}
+function showResetFlow(){if(confirm('RESET will permanently delete ALL data.\n\nContinue?')){const c=prompt('Type RESET to confirm:');if(c==='RESET'){localStorage.removeItem(HASH_KEY);localStorage.removeItem(DATA_KEY);showToast('All data cleared.','success');initLockScreen();}}}
 
-// ── PERSISTENCE ──
-async function loadData() {
-  const enc = localStorage.getItem(DATA_KEY);
-  if (!enc) { staff = []; return; }
-  try { staff = await decryptData(enc, sessionKey); } catch { staff = []; }
-}
+function openChangePwModal(){['pwCurrent','pwNew','pwConfirm'].forEach(id=>document.getElementById(id).value='');document.getElementById('pwError').textContent='';document.getElementById('pwModalOverlay').classList.add('visible');}
+async function changePassword(){const cur=document.getElementById('pwCurrent').value,nw=document.getElementById('pwNew').value,conf=document.getElementById('pwConfirm').value,err=document.getElementById('pwError');if(await hashPassword(cur)!==localStorage.getItem(HASH_KEY)){err.textContent='Current password is incorrect.';return;}if(nw.length<4){err.textContent='New password must be at least 4 characters.';return;}if(nw!==conf){err.textContent='Passwords do not match.';return;}const newKey=await deriveKey(nw);const newEnc=await encryptData(staff,newKey);localStorage.setItem(DATA_KEY,newEnc);localStorage.setItem(HASH_KEY,await hashPassword(nw));sessionKey=newKey;await syncToCloud(newEnc);closeModal('pwModalOverlay');showToast('Password updated and synced.','success');}
 
-async function saveData() {
-  localStorage.setItem(DATA_KEY, await encryptData(staff, sessionKey));
-}
+function initLocChips(){const c=document.getElementById('locChips');const all=[{label:'All',val:null},...LOCATIONS.map(l=>({label:l,val:l}))];c.innerHTML=all.map(l=>`<button class="loc-chip ${activeLocFilter===l.val?'active':''}" onclick="setLocFilter(${l.val===null?'null':`'${l.val}'`})">${l.label}</button>`).join('');}
+function setLocFilter(val){activeLocFilter=val;initLocChips();renderList();}
 
-// ── LOCK ──
-async function initLockScreen() {
-  const hash = localStorage.getItem(HASH_KEY);
-  if (!hash) {
-    document.getElementById('lockSub').textContent = 'Create a password to get started';
-    document.getElementById('lockBtn').textContent = 'Set Password';
-    document.getElementById('lockSetupHint').style.display = 'block';
-    document.getElementById('resetLink').style.display = 'none';
-  } else {
-    document.getElementById('lockSub').textContent = 'Enter your password to continue';
-    document.getElementById('lockBtn').textContent = 'Unlock';
-    document.getElementById('resetLink').style.display = 'block';
-  }
-  setTimeout(()=>document.getElementById('lockInput').focus(), 100);
-}
+function renderList(){const q=(document.getElementById('searchInput').value||'').toLowerCase();const filtered=staff.filter(s=>(s.code.toLowerCase().includes(q)||(s.role||'').toLowerCase().includes(q))&&(activeLocFilter===null||s.location===activeLocFilter));const grouped={};filtered.forEach(s=>{const loc=s.location||'Other';if(!grouped[loc])grouped[loc]=[];grouped[loc].push(s);});const order=activeLocFilter?[activeLocFilter]:LOCATIONS;let html='';order.forEach(loc=>{if(!grouped[loc]||!grouped[loc].length)return;html+=`<div class="list-group-header">${loc}</div>`;html+=grouped[loc].map(s=>`<div class="staff-item ${selectedCode===s.code?'active':''}" onclick="selectStaff('${s.code}')"><span class="staff-code">${s.code}</span><span class="staff-role">${s.role||'No role set'}</span></div>`).join('');});document.getElementById('staffList').innerHTML=html||'<div style="padding:14px;color:var(--text-muted);font-size:13px;text-align:center;">No entries found</div>';}
 
-async function unlock() {
-  const pw = document.getElementById('lockInput').value;
-  if (!pw) { document.getElementById('lockError').textContent = 'Please enter a password.'; return; }
-  const hash = localStorage.getItem(HASH_KEY);
-  if (!hash) {
-    if (pw.length < 4) { document.getElementById('lockError').textContent = 'At least 4 characters required.'; return; }
-    localStorage.setItem(HASH_KEY, await hashPassword(pw));
-    sessionKey = await deriveKey(pw);
-    staff = []; await saveData(); openApp();
-  } else {
-    if (await hashPassword(pw) !== hash) {
-      document.getElementById('lockError').textContent = 'Incorrect password.';
-      document.getElementById('lockInput').value = ''; document.getElementById('lockInput').focus(); return;
-    }
-    sessionKey = await deriveKey(pw);
-    await loadData(); openApp();
-  }
-}
+function selectStaff(code){selectedCode=code;renderList();renderProfile();}
+function getStaff(code){return staff.find(s=>s.code===code);}
 
-function openApp() {
-  document.getElementById('lockScreen').style.display = 'none';
-  document.getElementById('app').classList.add('visible');
-  initLocChips();
-  renderList();
-}
+function renderProfile(){const s=getStaff(selectedCode);if(!s)return;const ints=(s.interactions||[]).sort((a,b)=>new Date(b.date)-new Date(a.date));document.getElementById('mainContent').innerHTML=`<div class="profile-header"><div><div class="profile-code-badge">${s.code}</div><div class="profile-role-display">${s.role||'Staff Member'}${s.location?`<span class="loc-badge">${s.location}</span>`:''}</div></div><div class="profile-actions"><button class="btn btn-ghost" onclick="openEditModal('${s.code}')">Edit</button><button class="btn btn-danger" onclick="deleteStaff('${s.code}')">Delete</button></div></div><div class="section"><div class="section-title">Background</div><div class="info-grid"><div class="info-card"><div class="info-label">Family / Spouse</div><div class="info-value">${s.family||''}</div></div><div class="info-card"><div class="info-label">Kids</div><div class="info-value">${s.kids||''}</div></div><div class="info-card"><div class="info-label">Hobbies / Interests</div><div class="info-value">${s.hobbies||''}</div></div><div class="info-card"><div class="info-label">Years in District</div><div class="info-value">${s.years||''}</div></div><div class="info-card"><div class="info-label">Notable Life Events</div><div class="info-value">${s.events||''}</div></div><div class="info-card"><div class="info-label">Communication Style</div><div class="info-value">${s.comm||''}</div></div></div></div>${s.notes?`<div class="section"><div class="section-title">General Notes</div><div class="notes-full">${s.notes}</div></div>`:''}<div class="section"><div class="section-title">Interactions</div><div class="add-interaction-form" id="interactionForm"><div class="form-row"><div class="form-group"><label>Date</label><input type="date" id="iDate" value="${new Date().toISOString().split('T')[0]}"></div><div class="form-group"><label>Tone</label><select id="iTone"><option value="positive">Positive</option><option value="neutral" selected>Neutral</option><option value="negative">Negative</option></select></div></div><div class="form-group" style="margin-bottom:10px"><label>Notes</label><textarea id="iNotes" rows="3" placeholder="What happened?"></textarea></div><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-ghost" onclick="toggleInteractionForm()">Cancel</button><button class="btn btn-primary" onclick="addInteraction()">Log It</button></div></div><button class="btn btn-ghost" style="margin-bottom:12px;width:100%" onclick="toggleInteractionForm()">+ Log Interaction</button><div class="interactions-list">${ints.length===0?'<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px">No interactions logged yet.</div>':ints.map(i=>`<div class="interaction-card ${i.tone}"><button class="interaction-delete" onclick="deleteInteraction('${s.code}','${i.id}')">×</button><div class="interaction-meta"><span class="interaction-date">${i.date}</span><span class="tone-badge ${i.tone}">${i.tone}</span></div><div class="interaction-notes">${i.notes}</div></div>`).join('')}</div></div>`;}
 
-function lockApp() {
-  sessionKey = null; staff = []; selectedCode = null;
-  document.getElementById('app').classList.remove('visible');
-  document.getElementById('lockScreen').style.display = 'flex';
-  document.getElementById('lockInput').value = '';
-  document.getElementById('lockError').textContent = '';
-  initLockScreen();
-}
+function toggleInteractionForm(){document.getElementById('interactionForm').classList.toggle('visible');}
+async function addInteraction(){const s=getStaff(selectedCode);if(!s)return;const notes=document.getElementById('iNotes').value.trim();if(!notes){showToast('Add some notes first.','error');return;}if(!s.interactions)s.interactions=[];s.interactions.push({id:Date.now().toString(),date:document.getElementById('iDate').value,tone:document.getElementById('iTone').value,notes});await saveData();renderProfile();}
+async function deleteInteraction(code,id){if(!confirm('Remove this log entry?'))return;const s=getStaff(code);s.interactions=s.interactions.filter(i=>i.id!==id);await saveData();renderProfile();}
 
-function showResetFlow() {
-  if (confirm('RESET will permanently delete ALL data. This cannot be undone.\n\nContinue?')) {
-    const c = prompt('Type RESET to confirm:');
-    if (c === 'RESET') {
-      localStorage.removeItem(HASH_KEY); localStorage.removeItem(DATA_KEY);
-      document.getElementById('lockError').textContent = '';
-      showToast('All data cleared. Set a new password.', 'success');
-      initLockScreen();
-    }
-  }
-}
-
-// ── CHANGE PW ──
-function openChangePwModal() {
-  ['pwCurrent','pwNew','pwConfirm'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('pwError').textContent = '';
-  document.getElementById('pwModalOverlay').classList.add('visible');
-}
-
-async function changePassword() {
-  const cur = document.getElementById('pwCurrent').value;
-  const nw = document.getElementById('pwNew').value;
-  const conf = document.getElementById('pwConfirm').value;
-  const err = document.getElementById('pwError');
-  if (await hashPassword(cur) !== localStorage.getItem(HASH_KEY)) { err.textContent = 'Current password is incorrect.'; return; }
-  if (nw.length < 4) { err.textContent = 'New password must be at least 4 characters.'; return; }
-  if (nw !== conf) { err.textContent = 'Passwords do not match.'; return; }
-  const newKey = await deriveKey(nw);
-  localStorage.setItem(DATA_KEY, await encryptData(staff, newKey));
-  localStorage.setItem(HASH_KEY, await hashPassword(nw));
-  sessionKey = newKey;
-  closeModal('pwModalOverlay');
-  showToast('Password updated.', 'success');
-}
-
-// ── EXPORT/IMPORT ──
-async function exportData() {
-  if (!staff.length) { showToast('Nothing to export yet.', 'error'); return; }
-  const blob = new Blob([await encryptData(staff, sessionKey)], {type:'text/plain'});
-  const a = Object.assign(document.createElement('a'), {href:URL.createObjectURL(blob), download:`connections_${new Date().toISOString().split('T')[0]}.enc`});
-  a.click(); URL.revokeObjectURL(a.href);
-  showToast('Backup exported.', 'success');
-}
-
-async function importData(e) {
-  const file = e.target.files[0]; if (!file) return;
-  try {
-    const imported = await decryptData((await file.text()).trim(), sessionKey);
-    if (!Array.isArray(imported)) throw new Error();
-    if (!confirm(`Import ${imported.length} entries? This replaces current data.`)) { e.target.value=''; return; }
-    staff = imported; await saveData(); renderList();
-    showToast(`Imported ${imported.length} entries.`, 'success');
-  } catch { showToast('Import failed. Wrong password or corrupted file.', 'error'); }
-  e.target.value = '';
-}
-
-// ── LOCATION CHIPS ──
-function initLocChips() {
-  const container = document.getElementById('locChips');
-  const all = [{label:'All', val:null}, ...LOCATIONS.map(l=>({label:l,val:l}))];
-  container.innerHTML = all.map(l=>`
-    <button class="loc-chip ${activeLocFilter===l.val?'active':''}" onclick="setLocFilter(${l.val===null?'null':`'${l.val}'`})">${l.label}</button>
-  `).join('');
-}
-
-function setLocFilter(val) {
-  activeLocFilter = val;
-  initLocChips();
-  renderList();
-}
-
-// ── RENDER ──
-function renderList() {
-  const q = (document.getElementById('searchInput').value||'').toLowerCase();
-  let filtered = staff.filter(s => {
-    const matchQ = s.code.toLowerCase().includes(q)||(s.role||'').toLowerCase().includes(q);
-    const matchLoc = activeLocFilter===null || s.location===activeLocFilter;
-    return matchQ && matchLoc;
-  });
-
-  // Group by location
-  const grouped = {};
-  filtered.forEach(s => {
-    const loc = s.location || 'Other';
-    if (!grouped[loc]) grouped[loc] = [];
-    grouped[loc].push(s);
-  });
-
-  const order = activeLocFilter ? [activeLocFilter] : LOCATIONS;
-  let html = '';
-  order.forEach(loc => {
-    if (!grouped[loc] || grouped[loc].length === 0) return;
-    html += `<div class="list-group-header">${loc}</div>`;
-    html += grouped[loc].map(s=>`
-      <div class="staff-item ${selectedCode===s.code?'active':''}" onclick="selectStaff('${s.code}')">
-        <span class="staff-code">${s.code}</span>
-        <span class="staff-role">${s.role||'No role set'}</span>
-      </div>`).join('');
-  });
-
-  // Catch any with unrecognized locations
-  const unknownLocs = Object.keys(grouped).filter(l=>!LOCATIONS.includes(l));
-  unknownLocs.forEach(loc => {
-    html += `<div class="list-group-header">${loc}</div>`;
-    html += grouped[loc].map(s=>`
-      <div class="staff-item ${selectedCode===s.code?'active':''}" onclick="selectStaff('${s.code}')">
-        <span class="staff-code">${s.code}</span>
-        <span class="staff-role">${s.role||'No role set'}</span>
-      </div>`).join('');
-  });
-
-  document.getElementById('staffList').innerHTML = html || '<div style="padding:16px;color:var(--text-muted);font-size:13px;text-align:center;">No entries found</div>';
-}
-
-function selectStaff(code) { selectedCode=code; renderList(); renderProfile(); }
-function getStaff(code) { return staff.find(s=>s.code===code); }
-
-function renderProfile() {
-  const s = getStaff(selectedCode); if (!s) return;
-  const ints = (s.interactions||[]).sort((a,b)=>new Date(b.date)-new Date(a.date));
-  document.getElementById('mainContent').innerHTML = `
-    <div class="profile-header">
-      <div>
-        <div class="profile-code-badge">${s.code}</div>
-        <div class="profile-role-display">${s.role||'Staff Member'}${s.location?`<span class="loc-badge">${s.location}</span>`:''}</div>
-      </div>
-      <div class="profile-actions">
-        <button class="btn btn-ghost" onclick="openEditModal('${s.code}')">Edit</button>
-        <button class="btn btn-danger" onclick="deleteStaff('${s.code}')">Delete</button>
-      </div>
-    </div>
-    <div class="section">
-      <div class="section-title">Background</div>
-      <div class="info-grid">
-        <div class="info-card"><div class="info-label">Family / Spouse</div><div class="info-value">${s.family||''}</div></div>
-        <div class="info-card"><div class="info-label">Kids</div><div class="info-value">${s.kids||''}</div></div>
-        <div class="info-card"><div class="info-label">Hobbies / Interests</div><div class="info-value">${s.hobbies||''}</div></div>
-        <div class="info-card"><div class="info-label">Years in District</div><div class="info-value">${s.years||''}</div></div>
-        <div class="info-card"><div class="info-label">Notable Life Events</div><div class="info-value">${s.events||''}</div></div>
-        <div class="info-card"><div class="info-label">Communication Style</div><div class="info-value">${s.comm||''}</div></div>
-      </div>
-    </div>
-    ${s.notes?`<div class="section"><div class="section-title">General Notes</div><div class="notes-full">${s.notes}</div></div>`:''}
-    <div class="section">
-      <div class="section-title">Interactions</div>
-      <div class="add-interaction-form" id="interactionForm">
-        <div class="form-row">
-          <div class="form-group"><label>Date</label><input type="date" id="iDate" value="${new Date().toISOString().split('T')[0]}"></div>
-          <div class="form-group"><label>Tone</label><select id="iTone"><option value="positive">Positive</option><option value="neutral" selected>Neutral</option><option value="negative">Negative</option></select></div>
-        </div>
-        <div class="form-group" style="margin-bottom:10px"><label>Notes</label><textarea id="iNotes" rows="3" placeholder="What happened? What was discussed?"></textarea></div>
-        <div style="display:flex;gap:8px;justify-content:flex-end">
-          <button class="btn btn-ghost" onclick="toggleInteractionForm()">Cancel</button>
-          <button class="btn btn-primary" onclick="addInteraction()">Log It</button>
-        </div>
-      </div>
-      <button class="btn btn-ghost" style="margin-bottom:16px;width:100%" onclick="toggleInteractionForm()">+ Log Interaction</button>
-      <div class="interactions-list">
-        ${ints.length===0
-          ? '<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px">No interactions logged yet.</div>'
-          : ints.map(i=>`
-            <div class="interaction-card ${i.tone}">
-              <button class="interaction-delete" onclick="deleteInteraction('${s.code}','${i.id}')">×</button>
-              <div class="interaction-meta">
-                <span class="interaction-date">${i.date}</span>
-                <span class="tone-badge ${i.tone}">${i.tone}</span>
-              </div>
-              <div class="interaction-notes">${i.notes}</div>
-            </div>`).join('')}
-      </div>
-    </div>`;
-}
-
-function toggleInteractionForm() { document.getElementById('interactionForm').classList.toggle('visible'); }
-
-async function addInteraction() {
-  const s = getStaff(selectedCode); if (!s) return;
-  const notes = document.getElementById('iNotes').value.trim();
-  if (!notes) { showToast('Add some notes first.', 'error'); return; }
-  if (!s.interactions) s.interactions = [];
-  s.interactions.push({ id:Date.now().toString(), date:document.getElementById('iDate').value, tone:document.getElementById('iTone').value, notes });
-  await saveData(); renderProfile();
-}
-
-async function deleteInteraction(code, id) {
-  if (!confirm('Remove this log entry?')) return;
-  const s = getStaff(code);
-  s.interactions = s.interactions.filter(i=>i.id!==id);
-  await saveData(); renderProfile();
-}
-
-function openAddModal() {
-  editingCode = null;
-  document.getElementById('modalTitle').textContent = 'Add Staff Member';
-  ['fCode','fRole','fFamily','fKids','fHobbies','fYears','fEvents','fComm','fNotes'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('fLoc').value = activeLocFilter || '';
-  document.getElementById('fCode').disabled = false;
-  document.getElementById('modalOverlay').classList.add('visible');
-  setTimeout(()=>document.getElementById('fCode').focus(),100);
-}
-
-function openEditModal(code) {
-  const s = getStaff(code); editingCode = code;
-  document.getElementById('modalTitle').textContent = 'Edit Entry';
-  document.getElementById('fCode').value = s.code; document.getElementById('fCode').disabled = true;
-  document.getElementById('fRole').value = s.role||''; document.getElementById('fLoc').value = s.location||'';
-  document.getElementById('fFamily').value = s.family||'';
-  document.getElementById('fKids').value = s.kids||''; document.getElementById('fHobbies').value = s.hobbies||'';
-  document.getElementById('fYears').value = s.years||''; document.getElementById('fEvents').value = s.events||'';
-  document.getElementById('fComm').value = s.comm||''; document.getElementById('fNotes').value = s.notes||'';
-  document.getElementById('modalOverlay').classList.add('visible');
-}
-
-function closeModal(id) { document.getElementById(id).classList.remove('visible'); }
-
-async function saveStaff() {
-  const code = document.getElementById('fCode').value.trim().toUpperCase();
-  if (!code) { showToast('Code is required.','error'); return; }
-  if (!editingCode && staff.find(s=>s.code===code)) { showToast('Code already exists.','error'); return; }
-  const entry = {
-    code, role:document.getElementById('fRole').value.trim(),
-    location:document.getElementById('fLoc').value,
-    family:document.getElementById('fFamily').value.trim(),
-    kids:document.getElementById('fKids').value.trim(), hobbies:document.getElementById('fHobbies').value.trim(),
-    years:document.getElementById('fYears').value.trim(), events:document.getElementById('fEvents').value.trim(),
-    comm:document.getElementById('fComm').value.trim(), notes:document.getElementById('fNotes').value.trim(),
-    interactions: editingCode ? (getStaff(editingCode).interactions||[]) : []
-  };
-  if (editingCode) { const idx = staff.findIndex(s=>s.code===editingCode); staff[idx]=entry; }
-  else staff.push(entry);
-  await saveData(); closeModal('modalOverlay'); selectedCode=code; renderList(); renderProfile();
-}
-
-async function deleteStaff(code) {
-  if (!confirm('Permanently delete this entry and all interaction history?')) return;
-  staff = staff.filter(s=>s.code!==code); await saveData(); selectedCode=null; renderList();
-  document.getElementById('mainContent').innerHTML=`<div class="empty-state"><div class="empty-icon">◈</div><div class="empty-title">Select a staff member</div><div class="empty-sub">Choose someone from the list or add a new entry.</div></div>`;
-}
-
-function showToast(msg, type='success') {
-  const t = document.getElementById('toast');
-  t.textContent=msg; t.className=`toast ${type} show`;
-  setTimeout(()=>t.classList.remove('show'),3000);
-}
+function openAddModal(){editingCode=null;document.getElementById('modalTitle').textContent='Add Staff Member';['fCode','fRole','fFamily','fKids','fHobbies','fYears','fEvents','fComm','fNotes'].forEach(id=>document.getElementById(id).value='');document.getElementById('fLoc').value=activeLocFilter||'';document.getElementById('fCode').disabled=false;document.getElementById('modalOverlay').classList.add('visible');setTimeout(()=>document.getElementById('fCode').focus(),100);}
+function openEditModal(code){const s=getStaff(code);editingCode=code;document.getElementById('modalTitle').textContent='Edit Entry';document.getElementById('fCode').value=s.code;document.getElementById('fCode').disabled=true;document.getElementById('fRole').value=s.role||'';document.getElementById('fLoc').value=s.location||'';document.getElementById('fFamily').value=s.family||'';document.getElementById('fKids').value=s.kids||'';document.getElementById('fHobbies').value=s.hobbies||'';document.getElementById('fYears').value=s.years||'';document.getElementById('fEvents').value=s.events||'';document.getElementById('fComm').value=s.comm||'';document.getElementById('fNotes').value=s.notes||'';document.getElementById('modalOverlay').classList.add('visible');}
+function closeModal(id){document.getElementById(id).classList.remove('visible');}
+async function saveStaff(){const code=document.getElementById('fCode').value.trim().toUpperCase();if(!code){showToast('Code is required.','error');return;}if(!editingCode&&staff.find(s=>s.code===code)){showToast('Code already exists.','error');return;}const entry={code,role:document.getElementById('fRole').value.trim(),location:document.getElementById('fLoc').value,family:document.getElementById('fFamily').value.trim(),kids:document.getElementById('fKids').value.trim(),hobbies:document.getElementById('fHobbies').value.trim(),years:document.getElementById('fYears').value.trim(),events:document.getElementById('fEvents').value.trim(),comm:document.getElementById('fComm').value.trim(),notes:document.getElementById('fNotes').value.trim(),interactions:editingCode?(getStaff(editingCode).interactions||[]):[]};if(editingCode){const idx=staff.findIndex(s=>s.code===editingCode);staff[idx]=entry;}else staff.push(entry);await saveData();closeModal('modalOverlay');selectedCode=code;renderList();renderProfile();}
+async function deleteStaff(code){if(!confirm('Permanently delete this entry and all interaction history?'))return;staff=staff.filter(s=>s.code!==code);await saveData();selectedCode=null;renderList();document.getElementById('mainContent').innerHTML='<div class="empty-state"><div class="empty-icon">◈</div><div class="empty-title">Select a staff member</div><div class="empty-sub">Choose someone from the list or add a new entry.</div></div>';}
+function showToast(msg,type='success'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.classList.remove('show'),3500);}
 
 initLockScreen();
 </script>
