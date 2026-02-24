@@ -90,4 +90,242 @@
   .btn-danger:hover { background: rgba(200,112,112,0.1); }
   .section { margin-bottom: 24px; }
   .section-title { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-  .section-title
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .info-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
+  .info-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .info-value { font-size: 13px; color: var(--text); line-height: 1.4; }
+  .info-value:empty::after { content: '—'; color: var(--text-muted); }
+  .interactions-list { display: flex; flex-direction: column; gap: 8px; }
+  .interaction-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; border-left: 3px solid var(--neu); position: relative; }
+  .interaction-card.positive { border-left-color: var(--pos); }
+  .interaction-card.negative { border-left-color: var(--neg); }
+  .interaction-card.neutral { border-left-color: var(--neu); }
+  .interaction-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+  .interaction-date { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); }
+  .tone-badge { font-size: 10px; padding: 2px 7px; border-radius: 3px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+  .tone-badge.positive { background: rgba(126,184,160,0.15); color: var(--pos); }
+  .tone-badge.negative { background: rgba(200,112,112,0.15); color: var(--neg); }
+  .tone-badge.neutral { background: rgba(138,138,138,0.15); color: var(--neu); }
+  .interaction-notes { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+  .interaction-delete { position: absolute; top: 8px; right: 8px; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px; padding: 2px 6px; border-radius: 4px; opacity: 0; transition: opacity 0.2s; }
+  .interaction-card:hover .interaction-delete { opacity: 1; }
+  .interaction-delete:hover { color: var(--neg); }
+  .add-interaction-form { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 12px; display: none; }
+  .add-interaction-form.visible { display: block; }
+  .form-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .form-group { flex: 1; }
+  label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+  input, textarea, select { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; transition: border-color 0.2s; resize: vertical; }
+  input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+  select option { background: var(--surface2); }
+  .notes-full { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-size: 13px; color: var(--text-dim); line-height: 1.6; min-height: 50px; white-space: pre-wrap; }
+  .main::-webkit-scrollbar { width: 4px; }
+  .main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(4px); }
+  .modal-overlay.visible { display: flex; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 26px; width: 520px; max-width: 90vw; max-height: 88vh; overflow-y: auto; }
+  .modal-title { font-family: 'DM Serif Display', serif; font-size: 20px; margin-bottom: 18px; color: var(--accent); }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 11px 16px; font-size: 13px; color: var(--text); z-index: 9999; opacity: 0; transform: translateY(8px); transition: all 0.3s; pointer-events: none; max-width: 300px; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.success { border-left: 3px solid var(--pos); }
+  .toast.error { border-left: 3px solid var(--neg); }
+  .toast.info { border-left: 3px solid var(--accent); }
+</style>
+</head>
+<body>
+<div id="lockScreen">
+  <div class="lock-box">
+    <div class="lock-icon">🔒</div>
+    <div class="lock-title">Connections</div>
+    <div class="lock-sub" id="lockSub">Enter your password to continue</div>
+    <input type="password" class="lock-input" id="lockInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')unlock()">
+    <button class="lock-btn" id="lockBtn" onclick="unlock()">Unlock</button>
+    <div class="lock-error" id="lockError"></div>
+    <div id="lockSetupHint" class="lock-setup-hint" style="display:none">No password set yet. Enter a new password to get started.</div>
+    <button class="lock-link" id="resetLink" style="display:none" onclick="showResetFlow()">Forgot password / Reset all data</button>
+  </div>
+</div>
+<div id="setupScreen">
+  <div class="setup-box">
+    <div class="setup-title">Connect Google Drive</div>
+    <div class="setup-sub">One-time setup. Your data will sync automatically across all your devices.</div>
+    <div class="setup-step"><strong>Step 1:</strong> Go to <strong>script.google.com</strong> and click <strong>New project</strong></div>
+    <div class="setup-step"><strong>Step 2:</strong> Delete any existing code. Paste in the Apps Script code from Claude.</div>
+    <div class="setup-step"><strong>Step 3:</strong> Click <strong>Deploy → New deployment</strong>. Type: <strong>Web app</strong>. Access: <strong>Anyone</strong>. Click Deploy and authorize.</div>
+    <div class="setup-step"><strong>Step 4:</strong> Copy the Web app URL and paste it below.</div>
+    <input type="text" class="setup-url-input" id="scriptUrl" placeholder="https://script.google.com/macros/s/...">
+    <div class="setup-actions">
+      <button class="btn btn-ghost" onclick="skipSetup()">Skip for now</button>
+      <button class="btn btn-primary" onclick="saveScriptUrl()">Connect & Continue</button>
+    </div>
+  </div>
+</div>
+<div id="app">
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="app-title">Connections</div>
+      <div class="app-subtitle">Relationship Manager</div>
+    </div>
+    <div class="sidebar-actions">
+      <button class="sab" onclick="manualSync()">↻ Sync</button>
+      <button class="sab" onclick="exportData()">⬇ Export</button>
+      <button class="sab" onclick="document.getElementById('importFile').click()">⬆ Import</button>
+      <button class="sab" onclick="openChangePwModal()">🔑 PW</button>
+      <button class="sab" onclick="openSetupFromApp()">⚙ Drive</button>
+      <button class="sab" onclick="lockApp()">🔒 Lock</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+    </div>
+    <div class="sync-status" id="syncStatus">
+      <div class="sync-dot" id="syncDot"></div>
+      <span id="syncText">Not connected</span>
+    </div>
+    <div class="sidebar-search">
+      <input type="text" id="searchInput" placeholder="Search by code or role..." oninput="renderList()">
+    </div>
+    <div class="loc-filter">
+      <div class="loc-filter-label">Location</div>
+      <div class="loc-chips" id="locChips"></div>
+    </div>
+    <div class="sidebar-list" id="staffList"></div>
+    <button class="add-btn" onclick="openAddModal()">+ Add Staff Member</button>
+  </div>
+  <div class="main" id="mainContent">
+    <div class="empty-state">
+      <div class="empty-icon">◈</div>
+      <div class="empty-title">Select a staff member</div>
+      <div class="empty-sub">Choose someone from the list or add a new entry to get started.</div>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Add Staff Member</div>
+    <div class="form-row">
+      <div class="form-group"><label>Code *</label><input type="text" id="fCode" placeholder="e.g. STAFF01" style="font-family:'DM Mono',monospace;text-transform:uppercase"></div>
+      <div class="form-group"><label>Role / Department</label><input type="text" id="fRole" placeholder="e.g. Special Ed Teacher"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Location</label><select id="fLoc"><option value="">-- Select Location --</option><option>HHS</option><option>MHK</option><option>PLD</option><option>GNR</option><option>WCB</option><option>EMK</option><option>Registration</option><option>Central</option><option>EAs</option><option>Outside EWRSD</option><option>Other</option></select></div>
+      <div class="form-group"><label>Years in District</label><input type="text" id="fYears" placeholder="e.g. 6 years"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Family / Spouse</label><input type="text" id="fFamily" placeholder="e.g. Married, 2 kids"></div>
+      <div class="form-group"><label>Kids' Names / Ages</label><input type="text" id="fKids" placeholder="e.g. Emma (8), Jake (11)"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Hobbies / Interests</label><input type="text" id="fHobbies" placeholder="e.g. running, cooking"></div>
+      <div class="form-group"><label>Notable Life Events</label><input type="text" id="fEvents" placeholder="e.g. recently lost parent"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Communication Style</label><input type="text" id="fComm" placeholder="e.g. sensitive to tone"></div>
+    </div>
+    <div class="form-group" style="margin-bottom:10px"><label>General Notes</label><textarea id="fNotes" rows="3" placeholder="Anything else worth remembering..."></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modalOverlay')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveStaff()">Save</button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="pwModalOverlay">
+  <div class="modal" style="width:380px">
+    <div class="modal-title">Change Password</div>
+    <div class="form-group" style="margin-bottom:10px"><label>Current Password</label><input type="password" id="pwCurrent" placeholder="••••••••"></div>
+    <div class="form-group" style="margin-bottom:10px"><label>New Password</label><input type="password" id="pwNew" placeholder="••••••••"></div>
+    <div class="form-group" style="margin-bottom:10px"><label>Confirm New Password</label><input type="password" id="pwConfirm" placeholder="••••••••"></div>
+    <div style="font-size:12px;color:var(--neg);min-height:18px" id="pwError"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('pwModalOverlay')">Cancel</button>
+      <button class="btn btn-primary" onclick="changePassword()">Update Password</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const HASH_KEY='cx_pw_hash',DATA_KEY='cx_data',SCRIPT_URL_KEY='cx_script_url';
+const DEFAULT_SCRIPT_URL='https://script.google.com/macros/s/AKfycbwk99ZYFzj4A8fqMkYh-cr4Z172KMEGI0_snAFSOwhi_ji6rSAcwbl0IlGDoXBfI4w/exec';
+const LOCATIONS=['HHS','MHK','PLD','GNR','WCB','EMK','Registration','Central','EAs','Outside EWRSD','Other'];
+let sessionKey=null,staff=[],selectedCode=null,editingCode=null,activeLocFilter=null,scriptUrl=null,syncTimeout=null;
+
+async function hashPassword(pw){const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pw));return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');}
+async function deriveKey(pw){const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt:new TextEncoder().encode('connections_salt_v1'),iterations:100000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},true,['encrypt','decrypt']);}
+async function encryptData(data,key){const iv=crypto.getRandomValues(new Uint8Array(12));const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,new TextEncoder().encode(JSON.stringify(data)));const out=new Uint8Array(12+ct.byteLength);out.set(iv);out.set(new Uint8Array(ct),12);return btoa(String.fromCharCode(...out));}
+async function decryptData(b64,key){const bytes=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:bytes.slice(0,12)},key,bytes.slice(12));return JSON.parse(new TextDecoder().decode(pt));}
+
+async function syncToCloud(enc){if(!scriptUrl)return;try{setSyncStatus('syncing','Saving...');const r=await fetch(scriptUrl,{method:'POST',body:JSON.stringify({action:'save',payload:enc})});const j=await r.json();if(j.success){setSyncStatus('synced','Saved to Drive · '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));}else throw new Error();}catch{setSyncStatus('error','Sync failed — saved locally');}}
+async function loadFromCloud(){if(!scriptUrl)return null;try{setSyncStatus('syncing','Loading from Drive...');const r=await fetch(scriptUrl+'?action=load');const j=await r.json();if(j.success&&j.payload){setSyncStatus('synced','Loaded from Drive');return j.payload;}setSyncStatus('synced','No cloud data yet');return null;}catch{setSyncStatus('error','Could not reach Drive');return null;}}
+function setSyncStatus(state,text){const d=document.getElementById('syncDot'),t=document.getElementById('syncText');if(!d||!t)return;d.className='sync-dot '+state;t.textContent=text;}
+
+async function loadData(){const ce=await loadFromCloud();if(ce){try{staff=await decryptData(ce,sessionKey);localStorage.setItem(DATA_KEY,ce);return;}catch{}}const le=localStorage.getItem(DATA_KEY);if(le){try{staff=await decryptData(le,sessionKey);}catch{staff=[];}}else{staff=[];}}
+async function saveData(){const enc=await encryptData(staff,sessionKey);localStorage.setItem(DATA_KEY,enc);if(syncTimeout)clearTimeout(syncTimeout);syncTimeout=setTimeout(()=>syncToCloud(enc),1500);}
+async function manualSync(){const enc=await encryptData(staff,sessionKey);localStorage.setItem(DATA_KEY,enc);await syncToCloud(enc);showToast('Synced to Google Drive.','success');}
+
+async function initLockScreen(){scriptUrl=localStorage.getItem(SCRIPT_URL_KEY)||DEFAULT_SCRIPT_URL;const hash=localStorage.getItem(HASH_KEY);if(!hash){document.getElementById('lockSub').textContent='Create a password to get started';document.getElementById('lockBtn').textContent='Set Password';document.getElementById('lockSetupHint').style.display='block';document.getElementById('resetLink').style.display='none';}else{document.getElementById('lockSub').textContent='Enter your password to continue';document.getElementById('lockBtn').textContent='Unlock';document.getElementById('resetLink').style.display='block';}setTimeout(()=>document.getElementById('lockInput').focus(),100);}
+async function unlock(){const pw=document.getElementById('lockInput').value;if(!pw){document.getElementById('lockError').textContent='Please enter a password.';return;}const hash=localStorage.getItem(HASH_KEY);if(!hash){if(pw.length<4){document.getElementById('lockError').textContent='At least 4 characters required.';return;}localStorage.setItem(HASH_KEY,await hashPassword(pw));sessionKey=await deriveKey(pw);staff=[];await saveData();document.getElementById('lockScreen').style.display='none';await loadData();openApp();}else{if(await hashPassword(pw)!==hash){document.getElementById('lockError').textContent='Incorrect password.';document.getElementById('lockInput').value='';document.getElementById('lockInput').focus();return;}sessionKey=await deriveKey(pw);document.getElementById('lockScreen').style.display='none';await loadData();openApp();}}
+function openSetupFromApp(){document.getElementById('scriptUrl').value=scriptUrl||'';document.getElementById('setupScreen').style.display='flex';}
+function saveScriptUrl(){const url=document.getElementById('scriptUrl').value.trim();if(!url||!url.includes('script.google.com')){showToast('Please enter a valid Apps Script URL.','error');return;}scriptUrl=url;localStorage.setItem(SCRIPT_URL_KEY,url);document.getElementById('setupScreen').style.display='none';showToast('Google Drive connected!','success');manualSync();}
+function skipSetup(){document.getElementById('setupScreen').style.display='none';}
+function openApp(){document.getElementById('app').classList.add('visible');setSyncStatus(scriptUrl?'synced':'','Connected to Drive');initLocChips();renderList();}
+function lockApp(){sessionKey=null;staff=[];selectedCode=null;document.getElementById('app').classList.remove('visible');document.getElementById('lockScreen').style.display='flex';document.getElementById('lockInput').value='';document.getElementById('lockError').textContent='';initLockScreen();}
+function showResetFlow(){if(confirm('RESET will permanently delete ALL data.\n\nContinue?')){const c=prompt('Type RESET to confirm:');if(c==='RESET'){localStorage.removeItem(HASH_KEY);localStorage.removeItem(DATA_KEY);showToast('All data cleared.','success');initLockScreen();}}}
+
+function openChangePwModal(){['pwCurrent','pwNew','pwConfirm'].forEach(id=>document.getElementById(id).value='');document.getElementById('pwError').textContent='';document.getElementById('pwModalOverlay').classList.add('visible');}
+async function changePassword(){const cur=document.getElementById('pwCurrent').value,nw=document.getElementById('pwNew').value,conf=document.getElementById('pwConfirm').value,err=document.getElementById('pwError');if(await hashPassword(cur)!==localStorage.getItem(HASH_KEY)){err.textContent='Current password is incorrect.';return;}if(nw.length<4){err.textContent='New password must be at least 4 characters.';return;}if(nw!==conf){err.textContent='Passwords do not match.';return;}const newKey=await deriveKey(nw);const newEnc=await encryptData(staff,newKey);localStorage.setItem(DATA_KEY,newEnc);localStorage.setItem(HASH_KEY,await hashPassword(nw));sessionKey=newKey;await syncToCloud(newEnc);closeModal('pwModalOverlay');showToast('Password updated and synced.','success');}
+
+function initLocChips(){const c=document.getElementById('locChips');const all=[{label:'All',val:null},...LOCATIONS.map(l=>({label:l,val:l}))];c.innerHTML=all.map(l=>`<button class="loc-chip ${activeLocFilter===l.val?'active':''}" onclick="setLocFilter(${l.val===null?'null':`'${l.val}'`})">${l.label}</button>`).join('');}
+function setLocFilter(val){activeLocFilter=val;initLocChips();renderList();}
+
+function renderList(){const q=(document.getElementById('searchInput').value||'').toLowerCase();const filtered=staff.filter(s=>(s.code.toLowerCase().includes(q)||(s.role||'').toLowerCase().includes(q))&&(activeLocFilter===null||s.location===activeLocFilter));const grouped={};filtered.forEach(s=>{const loc=s.location||'Other';if(!grouped[loc])grouped[loc]=[];grouped[loc].push(s);});const order=activeLocFilter?[activeLocFilter]:LOCATIONS;let html='';order.forEach(loc=>{if(!grouped[loc]||!grouped[loc].length)return;html+=`<div class="list-group-header">${loc}</div>`;html+=grouped[loc].map(s=>`<div class="staff-item ${selectedCode===s.code?'active':''}" onclick="selectStaff('${s.code}')"><span class="staff-code">${s.code}</span><span class="staff-role">${s.role||'No role set'}</span></div>`).join('');});document.getElementById('staffList').innerHTML=html||'<div style="padding:14px;color:var(--text-muted);font-size:13px;text-align:center;">No entries found</div>';}
+
+function selectStaff(code){selectedCode=code;renderList();renderProfile();}
+function getStaff(code){return staff.find(s=>s.code===code);}
+
+function renderProfile(){const s=getStaff(selectedCode);if(!s)return;const ints=(s.interactions||[]).sort((a,b)=>new Date(b.date)-new Date(a.date));document.getElementById('mainContent').innerHTML=`<div class="profile-header"><div><div class="profile-code-badge">${s.code}</div><div class="profile-role-display">${s.role||'Staff Member'}${s.location?`<span class="loc-badge">${s.location}</span>`:''}</div></div><div class="profile-actions"><button class="btn btn-ghost" onclick="openEditModal('${s.code}')">Edit</button><button class="btn btn-danger" onclick="deleteStaff('${s.code}')">Delete</button></div></div><div class="section"><div class="section-title">Background</div><div class="info-grid"><div class="info-card"><div class="info-label">Family / Spouse</div><div class="info-value">${s.family||''}</div></div><div class="info-card"><div class="info-label">Kids</div><div class="info-value">${s.kids||''}</div></div><div class="info-card"><div class="info-label">Hobbies / Interests</div><div class="info-value">${s.hobbies||''}</div></div><div class="info-card"><div class="info-label">Years in District</div><div class="info-value">${s.years||''}</div></div><div class="info-card"><div class="info-label">Notable Life Events</div><div class="info-value">${s.events||''}</div></div><div class="info-card"><div class="info-label">Communication Style</div><div class="info-value">${s.comm||''}</div></div></div></div>${s.notes?`<div class="section"><div class="section-title">General Notes</div><div class="notes-full">${s.notes}</div></div>`:''}<div class="section"><div class="section-title">Interactions</div><div class="add-interaction-form" id="interactionForm"><div class="form-row"><div class="form-group"><label>Date</label><input type="date" id="iDate" value="${new Date().toISOString().split('T')[0]}"></div><div class="form-group"><label>Tone</label><select id="iTone"><option value="positive">Positive</option><option value="neutral" selected>Neutral</option><option value="negative">Negative</option></select></div></div><div class="form-group" style="margin-bottom:10px"><label>Notes</label><textarea id="iNotes" rows="3" placeholder="What happened?"></textarea></div><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-ghost" onclick="toggleInteractionForm()">Cancel</button><button class="btn btn-primary" onclick="addInteraction()">Log It</button></div></div><button class="btn btn-ghost" style="margin-bottom:12px;width:100%" onclick="toggleInteractionForm()">+ Log Interaction</button><div class="interactions-list">${ints.length===0?'<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px">No interactions logged yet.</div>':ints.map(i=>`<div class="interaction-card ${i.tone}"><button class="interaction-delete" onclick="deleteInteraction('${s.code}','${i.id}')">×</button><div class="interaction-meta"><span class="interaction-date">${i.date}</span><span class="tone-badge ${i.tone}">${i.tone}</span></div><div class="interaction-notes">${i.notes}</div></div>`).join('')}</div></div>`;}
+
+function toggleInteractionForm(){document.getElementById('interactionForm').classList.toggle('visible');}
+async function addInteraction(){const s=getStaff(selectedCode);if(!s)return;const notes=document.getElementById('iNotes').value.trim();if(!notes){showToast('Add some notes first.','error');return;}if(!s.interactions)s.interactions=[];s.interactions.push({id:Date.now().toString(),date:document.getElementById('iDate').value,tone:document.getElementById('iTone').value,notes});await saveData();renderProfile();}
+async function deleteInteraction(code,id){if(!confirm('Remove this log entry?'))return;const s=getStaff(code);s.interactions=s.interactions.filter(i=>i.id!==id);await saveData();renderProfile();}
+
+function openAddModal(){editingCode=null;document.getElementById('modalTitle').textContent='Add Staff Member';['fCode','fRole','fFamily','fKids','fHobbies','fYears','fEvents','fComm','fNotes'].forEach(id=>document.getElementById(id).value='');document.getElementById('fLoc').value=activeLocFilter||'';document.getElementById('fCode').disabled=false;document.getElementById('modalOverlay').classList.add('visible');setTimeout(()=>document.getElementById('fCode').focus(),100);}
+function openEditModal(code){const s=getStaff(code);editingCode=code;document.getElementById('modalTitle').textContent='Edit Entry';document.getElementById('fCode').value=s.code;document.getElementById('fCode').disabled=true;document.getElementById('fRole').value=s.role||'';document.getElementById('fLoc').value=s.location||'';document.getElementById('fFamily').value=s.family||'';document.getElementById('fKids').value=s.kids||'';document.getElementById('fHobbies').value=s.hobbies||'';document.getElementById('fYears').value=s.years||'';document.getElementById('fEvents').value=s.events||'';document.getElementById('fComm').value=s.comm||'';document.getElementById('fNotes').value=s.notes||'';document.getElementById('modalOverlay').classList.add('visible');}
+function closeModal(id){document.getElementById(id).classList.remove('visible');}
+async function saveStaff(){const code=document.getElementById('fCode').value.trim().toUpperCase();if(!code){showToast('Code is required.','error');return;}if(!editingCode&&staff.find(s=>s.code===code)){showToast('Code already exists.','error');return;}const entry={code,role:document.getElementById('fRole').value.trim(),location:document.getElementById('fLoc').value,family:document.getElementById('fFamily').value.trim(),kids:document.getElementById('fKids').value.trim(),hobbies:document.getElementById('fHobbies').value.trim(),years:document.getElementById('fYears').value.trim(),events:document.getElementById('fEvents').value.trim(),comm:document.getElementById('fComm').value.trim(),notes:document.getElementById('fNotes').value.trim(),interactions:editingCode?(getStaff(editingCode).interactions||[]):[]};if(editingCode){const idx=staff.findIndex(s=>s.code===editingCode);staff[idx]=entry;}else staff.push(entry);await saveData();closeModal('modalOverlay');selectedCode=code;renderList();renderProfile();}
+async function deleteStaff(code){if(!confirm('Permanently delete this entry and all interaction history?'))return;staff=staff.filter(s=>s.code!==code);await saveData();selectedCode=null;renderList();document.getElementById('mainContent').innerHTML='<div class="empty-state"><div class="empty-icon">◈</div><div class="empty-title">Select a staff member</div><div class="empty-sub">Choose someone from the list or add a new entry.</div></div>';}
+
+function exportData(){
+  const blob=new Blob([JSON.stringify(staff,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='connections-export-'+new Date().toISOString().split('T')[0]+'.json';
+  a.click();
+  showToast('Exported successfully.','success');
+}
+
+function importData(event){
+  const file=event.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async function(e){
+    try{
+      const imported=JSON.parse(e.target.result);
+      if(!Array.isArray(imported))throw new Error();
+      if(!confirm('This will merge '+imported.length+' entries with your existing data. Continue?'))return;
+      imported.forEach(entry=>{
+        if(!staff.find(s=>s.code===entry.code))staff.push(entry);
+      });
+      await saveData();
+      renderList();
+      showToast('Imported '+imported.length+' entries.','success');
+    }catch{showToast('Invalid file.','error');}
+    event.target.value='';
+  };
+  reader.readAsText(file);
+}
+
+function showToast(msg,type='success'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.classList.remove('show'),3500);}
+
+initLockScreen();
+</script>
+</body>
+</html>
