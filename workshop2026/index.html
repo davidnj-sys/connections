@@ -79,14 +79,9 @@ footer{font-size:.78rem;color:var(--muted);padding:24px 0 40px;text-align:center
       <button class="now" id="nowBtn">Happening Now</button>
     </div>
     <div class="chips" id="dayChips"></div>
-    <div class="chips"><button class="chip recBtn" id="recBtn" aria-pressed="false">Receptions</button><select class="chip" id="track" aria-label="Filter by track"></select><button class="chip" id="mine" aria-pressed="false">★ My Picks</button><button class="chip" id="badgeBtn" aria-pressed="false">Badge QR</button></div>
+    <div class="chips"><button class="chip recBtn" id="recBtn" aria-pressed="false">Receptions</button><select class="chip" id="track" aria-label="Filter by track"></select><button class="chip" id="mine" aria-pressed="false">★ My Picks</button></div>
   </div>
-  <div class="panel" id="badgePanel" hidden><div class="badgeBox">
-<h2>Badge pickup</h2><div class="qr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29" shape-rendering="crispEdges" role="img" aria-label="Badge pickup QR code" class="segno"><path fill="#fff" d="M0 0h29v29h-29z"/><path class="qrline" stroke="#000" d="M4 4.5h7m2 0h1m1 0h1m2 0h7m-21 1h1m5 0h1m1 0h5m1 0h1m5 0h1m-21 1h1m1 0h3m1 0h1m1 0h2m2 0h1m1 0h1m1 0h3m1 0h1m-21 1h1m1 0h3m1 0h1m1 0h2m1 0h2m1 0h1m1 0h3m1 0h1m-21 1h1m1 0h3m1 0h1m1 0h1m2 0h1m2 0h1m1 0h3m1 0h1m-21 1h1m5 0h1m1 0h1m5 0h1m5 0h1m-21 1h7m1 0h1m1 0h1m1 0h1m1 0h7m-12 1h1m2 0h1m-11 1h1m2 0h6m2 0h1m1 0h5m-19 1h1m1 0h1m1 0h1m1 0h2m3 0h3m2 0h1m1 0h2m-19 1h1m3 0h1m2 0h1m3 0h1m4 0h1m1 0h1m-21 1h1m2 0h3m2 0h2m4 0h1m1 0h1m1 0h1m1 0h1m-21 1h2m2 0h5m2 0h1m2 0h1m2 0h3m-12 1h2m1 0h1m2 0h2m1 0h1m1 0h1m-20 1h7m1 0h1m1 0h4m1 0h2m1 0h1m-19 1h1m5 0h1m1 0h3m3 0h2m1 0h3m-20 1h1m1 0h3m1 0h1m2 0h3m1 0h1m1 0h6m-21 1h1m1 0h3m1 0h1m4 0h2m1 0h1m-15 1h1m1 0h3m1 0h1m1 0h4m1 0h2m2 0h4m-21 1h1m5 0h1m2 0h1m4 0h1m1 0h1m2 0h1m-20 1h7m4 0h1m1 0h2m2 0h4"/></svg></div>
-<div class="badgeNum">Badge # 4233537</div>
-<div class="badgeInfo"><p><b>Where:</b> Registration, outside the Exhibit Hall on the second floor.</p>
-<p><b>Hours:</b> Mon, Oct 19, 8:00 AM to 4:30 PM · Tue, Oct 20, 8:00 AM to 4:00 PM · Wed, Oct 21, 8:00 AM to 3:00 PM</p>
-<p>Turn your screen brightness up before scanning.</p></div></div></div><div id="nowPanel" hidden></div>
+  <div id="nowPanel" hidden></div>
   <div class="status" id="status"></div>
   <div id="list"></div>
   <footer>Session details from the NJSBA Workshop agenda. Descriptions are shortened in the source listing. Check the official app for last-minute room changes.</footer>
@@ -171,7 +166,6 @@ let tmr;$("q").oninput=e=>{clearTimeout(tmr);tmr=setTimeout(()=>{state.q=e.targe
 $("nowBtn").onclick=()=>{state.mode="now";state.at=null;render();window.scrollTo({top:0,behavior:"smooth"})};
 document.addEventListener("click",e=>{const b=e.target.closest(".star");if(!b)return;const id=+b.dataset.id;picks.has(id)?picks.delete(id):picks.add(id);savePicks();render()});
 setInterval(()=>{if(state.mode==="now"&&!state.at)render()},60000);
-$("badgeBtn").onclick=()=>{const p=$("badgePanel");p.hidden=!p.hidden;$("badgeBtn").setAttribute("aria-pressed",!p.hidden);if(!p.hidden)window.scrollTo({top:0,behavior:"smooth"})};
 render();
 </script>
 </body>
