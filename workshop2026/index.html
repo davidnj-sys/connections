@@ -59,6 +59,10 @@ footer{font-size:.78rem;color:var(--muted);padding:24px 0 40px;text-align:center
 .badgeNum{font-size:1.25rem;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:.04em}
 .badgeInfo{font-size:.88rem;color:var(--muted);text-align:left;width:100%;max-width:420px}
 .badgeInfo b{color:var(--ink)}
+.recBtn{font-weight:700}
+.recBtn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.dir{display:inline-block;margin-top:8px;font-size:.85rem;font-weight:600;color:var(--navy)}
+.host{font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-top:8px}
 #badgeBtn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
 </style>
 </head>
@@ -71,7 +75,7 @@ footer{font-size:.78rem;color:var(--muted);padding:24px 0 40px;text-align:center
       <button class="now" id="nowBtn">Happening Now</button>
     </div>
     <div class="chips" id="dayChips"></div>
-    <div class="chips"><select class="chip" id="track" aria-label="Filter by track"></select><button class="chip" id="mine" aria-pressed="false">★ My Picks</button><button class="chip" id="badgeBtn" aria-pressed="false">Badge QR</button></div>
+    <div class="chips"><button class="chip recBtn" id="recBtn" aria-pressed="false">Receptions</button><select class="chip" id="track" aria-label="Filter by track"></select><button class="chip" id="mine" aria-pressed="false">★ My Picks</button><button class="chip" id="badgeBtn" aria-pressed="false">Badge QR</button></div>
   </div>
   <div class="panel" id="badgePanel" hidden><div class="badgeBox">
 <h2>Badge pickup</h2><div class="qr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29" shape-rendering="crispEdges" role="img" aria-label="Badge pickup QR code" class="segno"><path fill="#fff" d="M0 0h29v29h-29z"/><path class="qrline" stroke="#000" d="M4 4.5h7m2 0h1m1 0h1m2 0h7m-21 1h1m5 0h1m1 0h5m1 0h1m5 0h1m-21 1h1m1 0h3m1 0h1m1 0h2m2 0h1m1 0h1m1 0h3m1 0h1m-21 1h1m1 0h3m1 0h1m1 0h2m1 0h2m1 0h1m1 0h3m1 0h1m-21 1h1m1 0h3m1 0h1m1 0h1m2 0h1m2 0h1m1 0h3m1 0h1m-21 1h1m5 0h1m1 0h1m5 0h1m5 0h1m-21 1h7m1 0h1m1 0h1m1 0h1m1 0h7m-12 1h1m2 0h1m-11 1h1m2 0h6m2 0h1m1 0h5m-19 1h1m1 0h1m1 0h1m1 0h2m3 0h3m2 0h1m1 0h2m-19 1h1m3 0h1m2 0h1m3 0h1m4 0h1m1 0h1m-21 1h1m2 0h3m2 0h2m4 0h1m1 0h1m1 0h1m1 0h1m-21 1h2m2 0h5m2 0h1m2 0h1m2 0h3m-12 1h2m1 0h1m2 0h2m1 0h1m1 0h1m-20 1h7m1 0h1m1 0h4m1 0h2m1 0h1m-19 1h1m5 0h1m1 0h3m3 0h2m1 0h3m-20 1h1m1 0h3m1 0h1m2 0h3m1 0h1m1 0h6m-21 1h1m1 0h3m1 0h1m4 0h2m1 0h1m-15 1h1m1 0h3m1 0h1m1 0h4m1 0h2m2 0h4m-21 1h1m5 0h1m2 0h1m4 0h1m1 0h1m2 0h1m-20 1h7m4 0h1m1 0h2m2 0h4"/></svg></div>
@@ -89,7 +93,11 @@ const DAYS={19:"Mon, Oct 19",20:"Tue, Oct 20",21:"Wed, Oct 21",22:"Thu, Oct 22"}
 const toMin=t=>{const m=t.match(/(\d+):(\d+) ([AP])M/);let h=+m[1]%12;if(m[3]==="P")h+=12;return h*60+ +m[2]};
 S.forEach(s=>{s.s=toMin(s.start);s.e=toMin(s.end);s.hay=[s.title,s.speakers,s.presentedBy,s.description,s.track,s.room].join(" ").toLowerCase()});
 S.sort((a,b)=>a.day-b.day||a.s-b.s||a.title.localeCompare(b.title));
-let state={q:"",day:0,track:"",mine:false,mode:"list",at:null};
+const R=([{"day": 19, "start": "6:30 PM", "end": "", "host": "SSP", "venue": "Morton's Steak House", "where": "2100 Pacific Ave, Atlantic City"}, {"day": 19, "start": "3:00 PM", "end": "5:00 PM", "host": "Renaissance Learning, Great Minds, and MRA International", "venue": "Angelo's Fairmount Tavern", "where": "2300 Fairmount Ave, Atlantic City"}, {"day": 19, "start": "6:30 PM", "end": "9:30 PM", "host": "D&B Building Solutions LLC", "venue": "Cuba Libre", "where": "Tropicana"}, {"day": 19, "start": "7:00 PM", "end": "10:00 PM", "host": "Imagine Learning", "venue": "Topgolf", "where": "Ocean Casino Resort"}, {"day": 20, "start": "4:00 PM", "end": "6:00 PM", "host": "Renaissance Learning, Leading Edge, and Innovamat", "venue": "The Vue Rooftop Bar", "where": "The Claridge Hotel, 123 S. Indiana Ave, Atlantic City"}, {"day": 20, "start": "6:00 PM", "end": "", "host": "Arthur J. Gallagher", "venue": "Salon D", "where": "Borgata"}, {"day": 20, "start": "6:00 PM", "end": "11:00 PM", "host": "Busch Law Group", "venue": "Revlon House", "where": "118 South Plaza Place, Atlantic City"}, {"day": 20, "start": "5:30 PM", "end": "8:30 PM", "host": "Chartwells", "venue": "Cuba Libre Restaurant", "where": "Tropicana"}, {"day": 20, "start": "5:00 PM", "end": "7:00 PM", "host": "Brown & Brown", "venue": "Etess Arena", "where": "Hard Rock, 1000 Boardwalk, Atlantic City"}, {"day": 20, "start": "4:30 PM", "end": "7:30 PM", "host": "Gorman, D'Anella & Morlok", "venue": "Chickie's & Pete's", "where": "Tropicana"}, {"day": 20, "start": "4:30 PM", "end": "6:30 PM", "host": "UBS", "venue": "The Balcony", "where": "Hard Rock Hotel"}, {"day": 22, "start": "4:30 PM", "end": "6:30 PM", "host": "Fullmind", "venue": "Cuba Libre Restaurant & Rum Bar", "where": "Tropicana"}]).map((r,i)=>{const s=toMin(r.start);return {id:1000+i,kind:"rec",day:r.day,start:r.start,end:r.end,s,e:r.end?toMin(r.end):s+120,noEnd:!r.end,title:r.host,room:r.venue,where:r.where,
+  hay:[r.host,r.venue,r.where,"reception"].join(" ").toLowerCase()}}).sort((a,b)=>a.day-b.day||a.s-b.s);
+const D=()=>state.view==="rec"?R:S;
+const noun=()=>state.view==="rec"?"receptions":"sessions";
+let state={view:"sessions",q:"",day:0,track:"",mine:false,mode:"list",at:null};
 let picks=new Set();try{picks=new Set(JSON.parse(localStorage.getItem("ws26picks")||"[]"))}catch(e){}
 const savePicks=()=>{try{localStorage.setItem("ws26picks",JSON.stringify([...picks]))}catch(e){}};
 const $=id=>document.getElementById(id);
@@ -99,7 +107,13 @@ function hl(text){text=esc(text);const terms=state.q.trim().split(/\s+/).filter(
 function etNow(){const p=Object.fromEntries(new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",year:"numeric",month:"numeric",day:"numeric",hour:"numeric",minute:"numeric",hourCycle:"h23"}).formatToParts(new Date()).map(x=>[x.type,x.value]));
   return {y:+p.year,mo:+p.month,d:+p.day,min:+p.hour*60+ +p.minute}}
 const fmt=m=>{let h=Math.floor(m/60),mm=m%60,ap=h>=12?"PM":"AM";h=h%12||12;return h+":"+String(mm).padStart(2,"0")+" "+ap};
-function card(s,cls,badge){const on=picks.has(s.id);
+function recCard(s,cls,badge,on){const q=encodeURIComponent(s.room+", "+s.where+(/Atlantic City/.test(s.where)?"":", Atlantic City, NJ"));
+  return `<article class="card ${cls||""}"><button class="star" data-id="${s.id}" aria-pressed="${on}" aria-label="Save to My Picks">${on?"★":"☆"}</button>
+  <div class="meta">${badge||""}<span><b>${DAYS[s.day]}</b> · ${s.noEnd?s.start+" start (end time not listed)":s.start+" to "+s.end}</span></div>
+  <div class="host">Hosted by</div><h4 style="margin-top:2px">${hl(s.title)}</h4>
+  <div class="who"><b>${hl(s.room)}</b> · ${hl(s.where)}</div>
+  <a class="dir" href="https://www.google.com/maps/search/?api=1&query=${q}" target="_blank" rel="noopener">Directions ↗</a></article>`}
+function card(s,cls,badge){const on=picks.has(s.id);if(s.kind)return recCard(s,cls,badge,on);
   return `<article class="card ${cls||""}"><button class="star" data-id="${s.id}" aria-pressed="${on}" aria-label="Save to My Picks">${on?"★":"☆"}</button>
   <div class="meta">${badge||""}<span><b>${DAYS[s.day]}</b> · ${s.start} to ${s.end}</span><span class="room">${/^\d/.test(s.room)?"Room ":""}${esc(s.room)}</span></div>
   <h4>${hl(s.title)}</h4>
@@ -108,17 +122,17 @@ function card(s,cls,badge){const on=picks.has(s.id);
   ${s.description?`<p class="desc">${hl(s.description)}</p>`:""}
   ${s.track?`<span class="track">${hl(s.track)}</span>`:""}</article>`}
 function filtered(){const terms=state.q.toLowerCase().trim().split(/\s+/).filter(Boolean);
-  return S.filter(s=>(!state.day||s.day===state.day)&&(!state.track||s.track===state.track)&&(!state.mine||picks.has(s.id))&&terms.every(t=>s.hay.includes(t)))}
+  return D().filter(s=>(!state.day||s.day===state.day)&&(state.view==="rec"||!state.track||s.track===state.track)&&(!state.mine||picks.has(s.id))&&terms.every(t=>s.hay.includes(t)))}
 function renderList(){const r=filtered();let html="",last=null;
   r.forEach(s=>{if(s.day!==last){html+=`<h3 class="group">${DAYS[s.day]}</h3>`;last=s.day}html+=card(s)});
-  $("list").innerHTML=html||`<div class="empty">No sessions match. Try fewer or different words.</div>`;
-  $("status").textContent=`${r.length} of ${S.length} sessions`+(state.q?` matching "${state.q.trim()}"`:"")}
+  $("list").innerHTML=html||`<div class="empty">No ${noun()} match. Try fewer or different words.</div>`;
+  $("status").textContent=`${r.length} of ${D().length} ${noun()}`+(state.q?` matching "${state.q.trim()}"`:"")}
 function renderNow(day,min,live){
-  const base=S.filter(s=>(!state.track||s.track===state.track)&&(!state.mine||picks.has(s.id)));
-  const allOn=base.filter(s=>s.day===day&&s.s<=min&&min<s.e);const isAllDay=s=>s.e-s.s>=300&&!s.track;const on=allOn.filter(s=>!isAllDay(s));const open=allOn.filter(isAllDay);
+  const base=D().filter(s=>(state.view==="rec"||!state.track||s.track===state.track)&&(!state.mine||picks.has(s.id)));
+  const allOn=base.filter(s=>s.day===day&&s.s<=min&&min<s.e);const isAllDay=s=>!s.kind&&s.e-s.s>=300&&!s.track;const on=allOn.filter(s=>!isAllDay(s));const open=allOn.filter(isAllDay);
   const soon=base.filter(s=>s.day===day&&s.s>min&&s.s-min<=45);
   const label=`${DAYS[day]||"Oct "+day} at ${fmt(min)}`;
-  let html=`<div class="panel"><h2>${live?"Happening now":"Sessions at"} · ${label}</h2>
+  let html=`<div class="panel"><h2>${state.view==="rec"?(live?"Receptions now":"Receptions at"):(live?"Happening now":"Sessions at")} · ${label}</h2>
     <div class="row">Check another time:
     <select id="pDay">${Object.entries(DAYS).map(([k,v])=>`<option value="${k}" ${+k===day?"selected":""}>${v}</option>`).join("")}</select>
     <input id="pTime" type="time" value="${String(Math.floor(min/60)).padStart(2,"0")}:${String(min%60).padStart(2,"0")}">
@@ -140,6 +154,9 @@ function render(){if(state.mode==="now"){if(state.at)renderNow(state.at.day,stat
 $("dayChips").innerHTML=[[0,"All days"],...Object.entries(DAYS)].map(([k,v])=>`<button class="chip" data-day="${k}" aria-pressed="${+k===0}">${v}</button>`).join("");
 $("dayChips").onclick=e=>{const b=e.target.closest("[data-day]");if(!b)return;state.day=+b.dataset.day;state.mode="list";
   document.querySelectorAll("[data-day]").forEach(x=>x.setAttribute("aria-pressed",x===b));render()};
+$("recBtn").onclick=()=>{state.view=state.view==="rec"?"sessions":"rec";const r=state.view==="rec";$("recBtn").setAttribute("aria-pressed",r);
+  $("track").hidden=r;$("q").placeholder=r?"Search host, venue, hotel...":"Search title, speaker, topic, room...";
+  render();window.scrollTo({top:0,behavior:"smooth"})};
 const tracks=[...new Set(S.map(s=>s.track).filter(Boolean))].sort();
 $("track").innerHTML=`<option value="">All tracks</option>`+tracks.map(t=>`<option>${esc(t)}</option>`).join("");
 $("track").onchange=e=>{state.track=e.target.value;$("track").setAttribute("aria-pressed",!!state.track);render()};
